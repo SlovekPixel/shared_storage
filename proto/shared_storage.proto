@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package lockService;
+
+service LockService {
+  rpc AcquireLock (LockRequest) returns (LockResponse) {}
+  rpc ReleaseLock (LockRequestNoTime) returns (LockResponseNoTime) {}
+  rpc ExtendLock (LockRequest) returns (LockResponse) {}
+  rpc PersistLock (LockRequestNoTime) returns (LockResponseNoTime) {}
+  rpc PollLock (LockRequestNoTime) returns (PollResponse) {}
+  rpc PollLockList (LockRequestNoTimeList) returns (PollResponseList) {}
+  rpc EnsureLock (LockRequest) returns (LockResponse) {}
+}
+
+message LockRequest {
+  // Owner
+  string owner = 1;
+  // Record ID
+  string ticket = 2;
+  // Lock time
+  int32 lifetime = 10;
+}
+
+message LockRequestNoTime {
+  // Owner
+  string owner = 1;
+  // Record ID
+  string ticket = 2;
+}
+
+message LockRequestList {
+  string owner = 1;
+  repeated string tickets = 3;
+  int32 lifetime = 10;
+}
+
+message LockRequestNoTimeList {
+  string owner = 1;
+  repeated string tickets = 3;
+}
+
+message LockResponse {
+  bool isError = 3;
+  LockRequest lock = 6;
+  // Time spent on the request.
+  int32 wastedTime = 17;
+  // Additional message
+  string message = 20;
+}
+
+message LockResponseList {
+  bool isError = 3;
+  // ArrayList of LockResponse
+  repeated LockResponse responses = 6;
+  // Time spent on the request.
+  int32 wastedTime = 17;
+}
+
+message LockResponseNoTime {
+  bool isError = 3;
+  LockRequestNoTime lock = 6;
+  // Time spent on the request.
+  int32 wastedTime = 17;
+  // Additional message
+  string message = 20;
+}
+
+message LockResponseNoTimeList {
+  bool isError = 3;
+  // ArrayList of LockResponse
+  repeated LockRequestNoTime responses = 6;
+  // Time spent on the request.
+  int32 wastedTime = 17;
+}
+
+message PollResponse {
+  bool isBlocked = 1;
+  bool isError = 3;
+  LockRequestNoTime lock = 6;
+  // Time spent on the request.
+  int32 wastedTime = 17;
+}
+
+message PollResponseList {
+  repeated PollResponse responses = 1;
+  // Result of whole pollList.
+  bool isBlocked = 3;
+}
