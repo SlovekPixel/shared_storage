@@ -25,6 +25,7 @@ defmodule SharedStorage.Redis.RedisClient do
     }
   end
 
+  # Checking to verify that Redis is accessible.
   def check_connection do
     case Redix.command(:redix, ["PING"]) do
       {:ok, "PONG"} ->
@@ -36,86 +37,194 @@ defmodule SharedStorage.Redis.RedisClient do
     end
   end
 
-  def generate_key(ticket, owner \\ nil) do
-    case owner do
-      nil -> "#{@ttl_expire_key_prefix}#{ticket}"
-      _ -> "#{@ttl_expire_key_prefix}#{owner}:#{ticket}"
+  # Generate a key or pattern for Redis.
+  def generate_key(ticket \\ nil, owner \\ nil) do
+    case {ticket, owner} do
+      {nil, nil} ->
+        {:error, "It needs at least one value."}
+
+      {nil, owner} when is_binary(owner) ->
+        {:ok, "#{@ttl_expire_key_prefix}#{owner}:*"}
+
+      {ticket, nil} when is_binary(ticket) ->
+        {:ok, "#{@ttl_expire_key_prefix}*:#{ticket}"}
+
+      {ticket, owner} when is_binary(ticket) and is_binary(owner) ->
+        {:ok, "#{@ttl_expire_key_prefix}#{owner}:#{ticket}"}
+
+      _ ->
+        {:error, "Invalid input."}
     end
   end
 
-  def generate_value(ticket, owner \\ nil) do
-    case owner do
-      nil -> "#{ticket}"
-      _ -> "#{owner}:#{ticket}"
+  # Generating a value for Redis.
+  def generate_value(ticket, owner) do
+    case {ticket, owner} do
+      {ticket, owner} when is_binary(ticket) and is_binary(owner) ->
+        {:ok, "#{owner}:#{ticket}"}
+
+      _ ->
+        {:error, "Invalid input."}
     end
   end
 
-  def set_timeLock(owner, ticket, lifetime) do
-    key = generate_key(ticket, owner)
-    value = generate_value(ticket, owner)
+  # Exactly set the time lock on the ticket in seconds.
+  def set_timeLock_force(owner, ticket, lifetime) do
+    case generate_key(ticket, owner) do
+      {:ok, key} ->
+        case generate_value(ticket, owner) do
+          {:ok, value} ->
+            Redix.command(:redix, ["SET", key, value, "EX", Integer.to_string(lifetime)])
+            |> case do
+                 {:ok, _} -> {:ok, "OK"}
+                 error -> {:error, "Failed to set_timeLock: #{inspect(error)}"}
+               end
 
-    Redix.command(:redix, ["SET", key, value, "EX", Integer.to_string(lifetime)])
-    |> case do
-         {:ok, "OK"} -> :ok
-         error -> {:error, "Failed to set_timeLock: #{inspect(error)}"}
-       end
+          {:error, reason} ->
+            {:error, "Failed to generate value: #{reason}"}
+        end
+
+      {:error, reason} ->
+        {:error, "Failed to generate key: #{reason}"}
+    end
   end
 
-  def set_noTimeLock(owner, ticket) do
-    key = generate_key(ticket, owner)
-    value = generate_value(ticket, owner)
+  # Accurately set a permanent lock on the ticket.
+  def set_noTimeLock_force(owner, ticket) do
+    case generate_key(ticket, owner) do
+      {:ok, key} ->
+        case generate_value(ticket, owner) do
+          {:ok, value} ->
+            Redix.command(:redix, ["SET", key, value])
+            |> case do
+                 {:ok, _} -> {:ok, "OK"}
+                 error -> {:error, "Failed to set_noTimeLock: #{inspect(error)}"}
+               end
 
-    Redix.command(:redix, ["SET", key, value])
-    |> case do
-         {:ok, "OK"} -> :ok
-         error -> {:error, "Failed to set_noTimeLock: #{inspect(error)}"}
-       end
+          {:error, reason} ->
+            {:error, "Failed to generate value: #{reason}"}
+        end
+
+      {:error, reason} ->
+        {:error, "Failed to generate key: #{reason}"}
+    end
   end
 
   def set_timeLock_notExists(owner, ticket, lifetime) do
-    key = generate_key(ticket, owner)
-    value = generate_value(ticket, owner)
+    case generate_key(ticket, owner) do
+      {:ok, key} ->
+        case generate_value(ticket, owner) do
+          {:ok, value} ->
+            Redix.command(:redix, ["SETNX", key, value])
+            |> case do
+                 {:ok, 1} ->
+                   case Redix.command(:redix, ["EXPIRE", key, Integer.to_string(lifetime)]) do
+                     {:ok, 1} -> :ok  # TTL успешно установлен
+                     {:ok, 0} -> {:error, "Failed to set TTL"}
+                     error -> {:error, "Failed to set TTL: #{inspect(error)}"}
+                   end
 
-    Redix.command(:redix, ["SETNX", key, value])
-    |> case do
-         {:ok, 1} ->
-           Redix.command(:redix, ["EXPIRE", key, Integer.to_string(lifetime)])
-           :ok
-         {:ok, 0} -> {:error, "Key already exists"}
-         error -> {:error, "Failed to set_timeLock_notExists: #{inspect(error)}"}
-       end
+                 {:ok, 0} -> {:error, "Key already exists"}
+                 error -> {:error, "Failed to set_timeLock_notExists: #{inspect(error)}"}
+               end
+
+          {:error, reason} ->
+            {:error, "Failed to generate value: #{reason}"}
+        end
+
+      {:error, reason} ->
+        {:error, "Failed to generate key: #{reason}"}
+    end
   end
 
-  def set_timeLock_force(owner, ticket, lifetime) do
-    key = generate_key(ticket, owner)
-    value = generate_value(ticket, owner)
-
-    Redix.command(:redix, ["SET", key, value, "EX", Integer.to_string(lifetime)])
-    |> case do
-         {:ok, "OK"} -> :ok
-         error -> {:error, "Failed to acquire lock: #{inspect(error)}"}
-       end
-  end
-
+  # Get the value of a ticket by key. The owner must match.
   def get_lock_value(owner, ticket) do
-    key = generate_key(ticket, owner)
+    case generate_key(ticket, owner) do
+      {:ok, key} ->
+        Redix.command(:redix, ["GET", key])
+        |> case do
+             {:ok, nil} -> {:error, "Key not found"}
+             {:ok, value} -> {:ok, value}
+             error -> {:error, "Failed to get value: #{inspect(error)}"}
+           end
 
-    Redix.command(:redix, ["GET", key])
-    |> case do
-         {:ok, nil} -> {:error, "Key not found"}
-         {:ok, value} -> {:ok, value}
-         error -> {:error, "Failed to get value: #{inspect(error)}"}
-       end
+      {:error, reason} ->
+        {:error, "Failed to generate key: #{reason}"}
+    end
   end
 
+  # Release the lock if the owner is the same.
   def release_lock(ticket, owner) do
-    key = generate_key(ticket, owner)
+    case verify_owner(ticket, owner) do
+      :ok ->
+        case generate_key(ticket, owner) do
+          {:ok, key} ->
+            Redix.command(:redix, ["DEL", key])
+            |> case do
+                 {:ok, 1} -> :ok
+                 {:ok, 0} -> {:error, :not_found}
+                 error -> {:error, "Failed to release lock: #{inspect(error)}"}
+               end
 
-    Redix.command(:redix, ["DEL", key])
-    |> case do
-         {:ok, 1} -> :ok  # 1 означает, что ключ был удален
-         {:ok, 0} -> {:error, :not_found}  # 0 означает, что ключ не был найден
-         error -> {:error, "Failed to release_lock: #{inspect(error)}"}
-       end
+          {:error, reason} ->
+            {:error, "Failed to generate key: #{reason}"}
+        end
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  # Receive all of the owner's keys.
+  def get_keys_by_owner(owner) do
+    case generate_key(nil, owner) do
+      {:ok, pattern} ->
+        Redix.command(:redix, ["KEYS", pattern])
+        |> case do
+             {:ok, keys} when is_list(keys) and length(keys) > 0 -> {:ok, keys}
+             {:ok, []} -> {:error, "No keys found for owner #{owner}"}
+             error -> {:error, "Failed to get keys for owner: #{inspect(error)}"}
+           end
+
+      {:error, reason} ->
+        {:error, "Failed to generate key: #{reason}"}
+    end
+  end
+
+  # Get owner by the ticket.
+  def get_owner_by_ticket(ticket) do
+    case generate_key(ticket, nil) do
+      {:ok, pattern} ->
+        case Redix.command(:redix, ["KEYS", pattern]) do
+          {:ok, [key]} ->
+            Redix.command(:redix, ["GET", key])
+            |> case do
+                 {:ok, value} when is_binary(value) ->
+                   [owner, _] = String.split(value, ":")
+                   {:ok, owner}
+
+                 {:error, reason} -> {:error, "Failed to get owner by ticket: #{reason}"}
+               end
+
+          {:ok, []} -> {:error, "No owner found for ticket #{ticket}"}
+          error -> {:error, "Failed to find key for ticket: #{inspect(error)}"}
+        end
+
+      {:error, reason} ->
+        {:error, "Failed to generate key: #{reason}"}
+    end
+  end
+
+  # Checking to verify you're a ticket owner.
+  def verify_owner(ticket, owner) do
+    case generate_key(ticket, owner) do
+      {:ok, key} ->
+        case Redix.command(:redix, ["GET", key]) do
+          {:ok, value} -> {:ok, value}
+          {:error, reason} -> {:error, "Failed to verify owner: #{inspect(reason)}"}
+        end
+
+      {:error, reason} ->
+        {:error, "Failed to generate key: #{reason}"}
+    end
   end
 end
