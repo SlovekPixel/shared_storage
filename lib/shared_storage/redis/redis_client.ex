@@ -76,7 +76,7 @@ defmodule SharedStorage.Redis.RedisClient do
           {:ok, value} ->
             Redix.command(:redix, ["SET", key, value, "EX", Integer.to_string(lifetime)])
             |> case do
-                 {:ok, _} -> {:ok, "OK"}
+                 {:ok, _} -> :ok
                  error -> {:error, "Failed to set_timeLock: #{inspect(error)}"}
                end
 
@@ -190,6 +190,25 @@ defmodule SharedStorage.Redis.RedisClient do
     end
   end
 
+  def is_ticket_not_locked(ticket) do
+    case generate_key(ticket, nil) do
+      {:ok, pattern} ->
+        case Redix.command(:redix, ["KEYS", pattern]) do
+          {:ok, []} ->
+            :ok
+
+          {:ok, _keys} ->
+            {:error, "Ticket #{ticket} is already locked"}
+
+          error ->
+            {:error, "Failed to check keys for ticket #{ticket}: #{inspect(error)}"}
+        end
+
+      {:error, reason} ->
+               {:error, "Failed to generate key: #{reason}"}
+    end
+  end
+
   # Get owner by the ticket.
   def get_owner_by_ticket(ticket) do
     case generate_key(ticket, nil) do
@@ -216,15 +235,15 @@ defmodule SharedStorage.Redis.RedisClient do
 
   # Checking to verify you're a ticket owner.
   def verify_owner(ticket, owner) do
-    case generate_key(ticket, owner) do
-      {:ok, key} ->
-        case Redix.command(:redix, ["GET", key]) do
-          {:ok, value} -> {:ok, value}
-          {:error, reason} -> {:error, "Failed to verify owner: #{inspect(reason)}"}
-        end
+    case get_owner_by_ticket(ticket) do
+      {:ok, ticket_owner} when ticket_owner == owner ->
+        {:ok, "Owner verified. Owner: #{owner}"}
+
+      {:ok, _} ->
+        {:error, "Owner verification failed. The owner does not match."}
 
       {:error, reason} ->
-        {:error, "Failed to generate key: #{reason}"}
+        {:error, "Failed to verify owner: #{reason}"}
     end
   end
 end

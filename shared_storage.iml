@@ -60,6 +60,18 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/protobuf_generate" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ranch" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/redix" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/certifi" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/combine" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/hackney" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/idna" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/metrics" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mimerl" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/parse_trans" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ssl_verify_fun" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/timex" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/tzdata" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/unicode_util_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/validate" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="phoenix" level="project" />
@@ -166,5 +178,10 @@
     <orderEntry type="library" name="faker" level="project" />
     <orderEntry type="library" name="ex_machina" level="project" />
     <orderEntry type="library" name="grpc_reflection" level="project" />
+    <orderEntry type="library" name="validate" level="project" />
+    <orderEntry type="library" name="timex" level="project" />
+    <orderEntry type="library" name="tzdata" level="project" />
+    <orderEntry type="library" name="combine" level="project" />
+    <orderEntry type="library" name="benchfella" level="project" />
   </component>
 </module>

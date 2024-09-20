@@ -13,18 +13,31 @@ defmodule SharedStorage.GRPCHandler do
 
   # Lock the recording for a period of time if the recording is not locked.
   def acquire_lock(%LockRequest{owner: owner, ticket: ticket, lifetime: lifetime}, _stream) do
-    case RedisClient.set_timeLock(owner, ticket, lifetime) do
+    case RedisClient.is_ticket_not_locked(ticket) do
       :ok ->
-        {:ok, %LockResponse{
-          isError: false,
-          lock: %LockRequest{
-            owner: owner,
-            ticket: ticket,
-            lifetime: lifetime
-          },
-          message: "acquire_lock successfully."}
-        }
-      {:error, reason} ->
+        case RedisClient.set_timeLock_notExists(owner, ticket, lifetime) do
+          :ok ->
+            {:ok, %LockResponse{
+              isError: false,
+              lock: %LockRequest{
+                owner: owner,
+                ticket: ticket,
+                lifetime: lifetime
+              },
+              message: "acquire_lock successfully."}
+            }
+          {:error, reason} ->
+            {:ok, %LockResponse{
+              isError: true,
+              lock: %LockRequest{
+                owner: owner,
+                ticket: ticket,
+                lifetime: lifetime
+              },
+              message: reason}
+            }
+        end
+      {:error, _reason} ->
         {:ok, %LockResponse{
           isError: true,
           lock: %LockRequest{
@@ -32,7 +45,7 @@ defmodule SharedStorage.GRPCHandler do
             ticket: ticket,
             lifetime: lifetime
           },
-          message: reason}
+          message: _reason}
         }
     end
   end

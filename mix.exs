@@ -49,6 +49,7 @@ defmodule SharedStorage.MixProject do
       {:protobuf_generate, "~> 0.1.0"},
       {:grpc_reflection, "~> 0.1.0"},
       {:grpc, "~> 0.9"},
+      {:validate, "~> 1.3"},
       {:faker, "~> 0.17", only: :test},
       {:ex_machina, "~> 2.7.0", only: :test}
     ]
