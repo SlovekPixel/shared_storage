@@ -38,7 +38,7 @@ defmodule SharedStorage.Redis.RedisClient do
   end
 
   # Generate a key or pattern for Redis.
-  def generate_key(ticket \\ nil, owner \\ nil) do
+  def generate_key(owner \\ nil, ticket \\ nil) do
     case {ticket, owner} do
       {nil, nil} ->
         {:error, "It needs at least one value."}
@@ -58,7 +58,7 @@ defmodule SharedStorage.Redis.RedisClient do
   end
 
   # Generating a value for Redis.
-  def generate_value(ticket, owner) do
+  def generate_value(owner, ticket) do
     case {ticket, owner} do
       {ticket, owner} when is_binary(ticket) and is_binary(owner) ->
         {:ok, "#{owner}:#{ticket}"}
@@ -70,9 +70,9 @@ defmodule SharedStorage.Redis.RedisClient do
 
   # Exactly set the time lock on the ticket in seconds.
   def set_timeLock_force(owner, ticket, lifetime) do
-    case generate_key(ticket, owner) do
+    case generate_key(owner, ticket) do
       {:ok, key} ->
-        case generate_value(ticket, owner) do
+        case generate_value(owner, ticket) do
           {:ok, value} ->
             Redix.command(:redix, ["SET", key, value, "EX", Integer.to_string(lifetime)])
             |> case do
@@ -91,9 +91,9 @@ defmodule SharedStorage.Redis.RedisClient do
 
   # Accurately set a permanent lock on the ticket.
   def set_noTimeLock_force(owner, ticket) do
-    case generate_key(ticket, owner) do
+    case generate_key(owner, ticket) do
       {:ok, key} ->
-        case generate_value(ticket, owner) do
+        case generate_value(owner, ticket) do
           {:ok, value} ->
             Redix.command(:redix, ["SET", key, value])
             |> case do
@@ -111,15 +111,15 @@ defmodule SharedStorage.Redis.RedisClient do
   end
 
   def set_timeLock_notExists(owner, ticket, lifetime) do
-    case generate_key(ticket, owner) do
+    case generate_key(owner, ticket) do
       {:ok, key} ->
-        case generate_value(ticket, owner) do
+        case generate_value(owner, ticket) do
           {:ok, value} ->
             Redix.command(:redix, ["SETNX", key, value])
             |> case do
                  {:ok, 1} ->
                    case Redix.command(:redix, ["EXPIRE", key, Integer.to_string(lifetime)]) do
-                     {:ok, 1} -> :ok  # TTL успешно установлен
+                     {:ok, 1} -> :ok
                      {:ok, 0} -> {:error, "Failed to set TTL"}
                      error -> {:error, "Failed to set TTL: #{inspect(error)}"}
                    end
@@ -139,7 +139,7 @@ defmodule SharedStorage.Redis.RedisClient do
 
   # Get the value of a ticket by key. The owner must match.
   def get_lock_value(owner, ticket) do
-    case generate_key(ticket, owner) do
+    case generate_key(owner, ticket) do
       {:ok, key} ->
         Redix.command(:redix, ["GET", key])
         |> case do
@@ -154,10 +154,10 @@ defmodule SharedStorage.Redis.RedisClient do
   end
 
   # Release the lock if the owner is the same.
-  def release_lock(ticket, owner) do
-    case verify_owner(ticket, owner) do
+  def release_lock(owner, ticket) do
+    case verify_owner(owner, ticket) do
       :ok ->
-        case generate_key(ticket, owner) do
+        case generate_key(owner, ticket) do
           {:ok, key} ->
             Redix.command(:redix, ["DEL", key])
             |> case do
@@ -176,7 +176,7 @@ defmodule SharedStorage.Redis.RedisClient do
 
   # Receive all of the owner's keys.
   def get_keys_by_owner(owner) do
-    case generate_key(nil, owner) do
+    case generate_key(owner, nil) do
       {:ok, pattern} ->
         Redix.command(:redix, ["KEYS", pattern])
         |> case do
@@ -190,15 +190,15 @@ defmodule SharedStorage.Redis.RedisClient do
     end
   end
 
-  def is_ticket_not_locked(ticket) do
-    case generate_key(ticket, nil) do
+  def is_ticket_locked(ticket) do
+    case generate_key(nil, ticket) do
       {:ok, pattern} ->
         case Redix.command(:redix, ["KEYS", pattern]) do
           {:ok, []} ->
-            :ok
+            {:ok, false}
 
           {:ok, _keys} ->
-            {:error, "Ticket #{ticket} is already locked"}
+            {:ok, true}
 
           error ->
             {:error, "Failed to check keys for ticket #{ticket}: #{inspect(error)}"}
@@ -211,18 +211,23 @@ defmodule SharedStorage.Redis.RedisClient do
 
   # Get owner by the ticket.
   def get_owner_by_ticket(ticket) do
-    case generate_key(ticket, nil) do
+    case generate_key(nil, ticket) do
       {:ok, pattern} ->
         case Redix.command(:redix, ["KEYS", pattern]) do
           {:ok, [key]} ->
-            Redix.command(:redix, ["GET", key])
-            |> case do
-                 {:ok, value} when is_binary(value) ->
-                   [owner, _] = String.split(value, ":")
-                   {:ok, owner}
+            case Redix.command(:redix, ["GET", key]) do
+              {:ok, value} when is_binary(value) ->
+                case String.split(value, ":") do
+                  [owner, _] ->
+                    {:ok, owner}
 
-                 {:error, reason} -> {:error, "Failed to get owner by ticket: #{reason}"}
-               end
+                  _ ->
+                    {:error, "Invalid value format for ticket #{ticket}"}
+                end
+
+              {:ok, _} -> {:error, "Invalid value format for ticket #{ticket}"}
+              {:error, reason} -> {:error, "Failed to get owner by ticket: #{reason}"}
+            end
 
           {:ok, []} -> {:error, "No owner found for ticket #{ticket}"}
           error -> {:error, "Failed to find key for ticket: #{inspect(error)}"}
@@ -234,13 +239,13 @@ defmodule SharedStorage.Redis.RedisClient do
   end
 
   # Checking to verify you're a ticket owner.
-  def verify_owner(ticket, owner) do
+  def verify_owner(owner, ticket) do
     case get_owner_by_ticket(ticket) do
       {:ok, ticket_owner} when ticket_owner == owner ->
-        {:ok, "Owner verified. Owner: #{owner}"}
+        {:ok, true}
 
       {:ok, _} ->
-        {:error, "Owner verification failed. The owner does not match."}
+        {:ok, false}
 
       {:error, reason} ->
         {:error, "Failed to verify owner: #{reason}"}
