@@ -1,4 +1,8 @@
 defmodule SharedStorage.GRPCServer do
+  @moduledoc """
+  Description of grpc controllers.
+  """
+
   use GRPC.Server,
       service: LockService.LockService.Service
 

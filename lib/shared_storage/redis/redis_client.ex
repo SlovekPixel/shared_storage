@@ -1,4 +1,7 @@
 defmodule SharedStorage.Redis.RedisClient do
+  @moduledoc """
+  A module for operating with Redis.
+  """
   use GenServer
 
   @ttl_expire_key_prefix "lock:"

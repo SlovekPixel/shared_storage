@@ -1,4 +1,8 @@
 defmodule SharedStorage.GRPCHandler do
+  @moduledoc """
+  A module for implementing handler logic.
+  """
+
   alias LockService.{
     LockRequest,
     LockResponse,
@@ -12,6 +16,7 @@ defmodule SharedStorage.GRPCHandler do
     PollResponseList
     }
   alias SharedStorage.Redis.RedisClient
+  alias SharedStorage.Messages.ResponseMessages
 
   # Lock the recording for a period of time if the recording is not locked.
   def acquire_lock(%LockRequest{owner: owner, ticket: ticket, lifetime: lifetime}, _stream) do
@@ -26,7 +31,7 @@ defmodule SharedStorage.GRPCHandler do
                 ticket: ticket,
                 lifetime: lifetime
               },
-              message: "acquire_lock successfully."}
+              message: ResponseMessages.success_message("acquire_lock")}
             }
           {:error, reason} ->
             {:ok, %LockResponse{
@@ -47,7 +52,7 @@ defmodule SharedStorage.GRPCHandler do
             ticket: ticket,
             lifetime: lifetime
           },
-          message: "The Ticket has already been blocked."}
+          message: ResponseMessages.ticket_already_blocked()}
         }
       {:error, _reason} ->
         {:ok, %LockResponse{
