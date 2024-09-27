@@ -1,10 +1,14 @@
 defmodule SharedStorage.GRPCServer do
   @moduledoc """
-  Description of grpc controllers.
+  Description of gRPC controllers and reflection server.
   """
 
   use GRPC.Server,
       service: LockService.LockService.Service
+
+  use GrpcReflection.Server,
+      version: :v1alpha,
+      services: [LockService.LockService.Service]
 
   def start_link(_) do
     GRPC.Server.start(__MODULE__, 50051)

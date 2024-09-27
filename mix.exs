@@ -46,6 +46,7 @@ defmodule SharedStorage.MixProject do
       {:bandit, "~> 1.5"},
       {:redix, "~> 1.0"},
       {:dotenv, "~> 3.0.0"},
+      {:protobuf, "~> 0.13.0"},
       {:protobuf_generate, "~> 0.1.0"},
       {:grpc_reflection, "~> 0.1.0"},
       {:grpc, "~> 0.9"},

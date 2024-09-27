@@ -85,4 +85,5 @@ message PollResponseList {
   repeated PollResponse responses = 1;
   // Result of whole pollList.
   bool isBlocked = 3;
+  bool isError = 5;
 }

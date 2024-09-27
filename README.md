@@ -11,7 +11,10 @@ To start your Phoenix server:
 ## Proto
 #### Generate proto files.
 ``` bash
-mix protobuf.generate --output-path=./lib --include-path=./proto shared_storage.proto
+protoc --elixir_out=gen_descriptors=true,plugins=grpc:. "./lib/protos/shared_storage.proto"
+```
+``` bash
+mix protobuf.generate --output-path=./lib --include-path=./lib/protos shared_storage.proto
 ```
 
 ## Docker
