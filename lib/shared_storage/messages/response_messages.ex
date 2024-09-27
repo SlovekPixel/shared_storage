@@ -1,4 +1,4 @@
-defmodule MyApp.Constants.ResponseMessages do
+defmodule SharedStorage.Messages.ResponseMessages do
   @moduledoc """
   A module for storing messages used in responses.
   """
@@ -11,6 +11,8 @@ defmodule MyApp.Constants.ResponseMessages do
     "Error occurred during #{to_string(operation)}."
   end
 
+  def owner_mismatch, do: "Owner mismatch. Unable to perform a transaction on a ticket."
   def ticket_already_blocked, do: "The Ticket has already been blocked."
+  def ticket_not_blocked, do: "The ticket is not blocked."
   def unknown_error, do: "An unknown error occurred."
 end

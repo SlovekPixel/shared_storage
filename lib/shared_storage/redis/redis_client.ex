@@ -80,7 +80,7 @@ defmodule SharedStorage.Redis.RedisClient do
             Redix.command(:redix, ["SET", key, value, "EX", Integer.to_string(lifetime)])
             |> case do
                  {:ok, _} -> :ok
-                 error -> {:error, "Failed to set_timeLock: #{inspect(error)}"}
+                 error -> {:error, "Failed to set_timeLock_force: #{inspect(error)}"}
                end
 
           {:error, reason} ->
@@ -100,8 +100,8 @@ defmodule SharedStorage.Redis.RedisClient do
           {:ok, value} ->
             Redix.command(:redix, ["SET", key, value])
             |> case do
-                 {:ok, _} -> {:ok, "OK"}
-                 error -> {:error, "Failed to set_noTimeLock: #{inspect(error)}"}
+                 {:ok, _} -> :ok
+                 error -> {:error, "Failed to set_noTimeLock_force: #{inspect(error)}"}
                end
 
           {:error, reason} ->
@@ -123,7 +123,7 @@ defmodule SharedStorage.Redis.RedisClient do
                  {:ok, 1} ->
                    case Redix.command(:redix, ["EXPIRE", key, Integer.to_string(lifetime)]) do
                      {:ok, 1} -> :ok
-                     {:ok, 0} -> {:error, "Failed to set TTL"}
+                     {:ok, 0} -> {:error, 0}
                      error -> {:error, "Failed to set TTL: #{inspect(error)}"}
                    end
 
@@ -158,22 +158,17 @@ defmodule SharedStorage.Redis.RedisClient do
 
   # Release the lock if the owner is the same.
   def release_lock(owner, ticket) do
-    case verify_owner(owner, ticket) do
-      :ok ->
-        case generate_key(owner, ticket) do
-          {:ok, key} ->
-            Redix.command(:redix, ["DEL", key])
-            |> case do
-                 {:ok, 1} -> :ok
-                 {:ok, 0} -> {:error, :not_found}
-                 error -> {:error, "Failed to release lock: #{inspect(error)}"}
-               end
+    case generate_key(owner, ticket) do
+      {:ok, key} ->
+        Redix.command(:redix, ["DEL", key])
+        |> case do
+             {:ok, 1} -> :ok
+             {:ok, 0} -> {:error, :not_found}
+             error -> {:error, "Failed to release lock: #{inspect(error)}"}
+           end
 
-          {:error, reason} ->
-            {:error, "Failed to generate key: #{reason}"}
-        end
       {:error, reason} ->
-        {:error, reason}
+        {:error, "Failed to generate key: #{reason}"}
     end
   end
 

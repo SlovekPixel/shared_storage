@@ -21,37 +21,37 @@ defmodule SharedStorage.GRPCServer do
   end
 
   def acquire_lock(request, stream) do
-    { status, response } = SharedStorage.GRPCHandler.acquire_lock(request, stream)
+    { status, response } = SharedStorage.GRPCHandler.AcquireLock.acquire_lock(request, stream)
     response
   end
 
   def release_lock(request, stream) do
-    { status, response } = SharedStorage.GRPCHandler.release_lock(request, stream)
+    { status, response } = SharedStorage.GRPCHandler.ReleaseLock.release_lock(request, stream)
     response
   end
 
   def ensure_lock(request, stream) do
-    { status, response } = SharedStorage.GRPCHandler.ensure_lock(request, stream)
+    { status, response } = SharedStorage.GRPCHandler.EnsureLock.ensure_lock(request, stream)
     response
   end
 
   def extend_lock(request, stream) do
-    { status, response } = SharedStorage.GRPCHandler.extend_lock(request, stream)
+    { status, response } = SharedStorage.GRPCHandler.ExtendLock.extend_lock(request, stream)
     response
   end
 
   def persist_lock(request, stream) do
-    { status, response } = SharedStorage.GRPCHandler.persist_lock(request, stream)
+    { status, response } = SharedStorage.GRPCHandler.PersistLock.persist_lock(request, stream)
     response
   end
 
   def poll_lock(request, stream) do
-    { status, response } = SharedStorage.GRPCHandler.poll_lock(request, stream)
+    { status, response } = SharedStorage.GRPCHandler.PollLock.poll_lock(request, stream)
     response
   end
 
   def poll_lock_list(request, stream) do
-    { status, response } = SharedStorage.GRPCHandler.poll_lock_list(request, stream)
+    { status, response } = SharedStorage.GRPCHandler.PollLockList.poll_lock_list(request, stream)
     response
   end
 end
