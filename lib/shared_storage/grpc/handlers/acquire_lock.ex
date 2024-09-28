@@ -3,7 +3,7 @@ defmodule SharedStorage.GRPCHandler.AcquireLock do
   A module for implementing acquire_lock logic.
   """
 
-  alias LockService.{
+  alias SharedStorage.{
     LockRequest,
     LockResponse}
   alias SharedStorage.Redis.RedisClient

@@ -3,7 +3,7 @@ defmodule SharedStorage.GRPCHandler.ReleaseLock do
   A module for implementing release_lock logic.
   """
 
-  alias LockService.{
+  alias SharedStorage.{
     LockRequestNoTime,
     LockResponseNoTime}
   alias SharedStorage.Redis.RedisClient

@@ -1,6 +1,10 @@
 syntax = "proto3";
 
-package lockService;
+option java_multiple_files = true;
+option java_outer_classname = "SharedStorageProto";
+option objc_class_prefix = "HLW";
+
+package sharedStorage;
 
 service LockService {
   rpc AcquireLock (LockRequest) returns (LockResponse) {}

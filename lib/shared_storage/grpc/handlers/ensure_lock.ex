@@ -3,7 +3,7 @@ defmodule SharedStorage.GRPCHandler.EnsureLock do
   A module for implementing ensure_lock logic.
   """
 
-  alias LockService.{
+  alias SharedStorage.{
     LockRequest,
     LockResponse}
   alias SharedStorage.Redis.RedisClient

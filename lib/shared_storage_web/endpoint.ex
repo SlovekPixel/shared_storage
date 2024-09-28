@@ -1,6 +1,5 @@
 defmodule SharedStorageWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :shared_storage
-  use GRPC.Endpoint
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -11,10 +10,6 @@ defmodule SharedStorageWeb.Endpoint do
     signing_salt: "N+SEpd1h",
     same_site: "Lax"
   ]
-
-  intercept(GRPC.Server.Interceptors.Logger)
-  run(SharedStorage.LockService.Server)
-  run(SharedStorage.Reflection.Server)
 
   socket "/live", Phoenix.LiveView.Socket,
     websocket: [connect_info: [session: @session_options]],

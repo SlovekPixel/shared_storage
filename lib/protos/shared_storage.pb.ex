@@ -1,4 +1,4 @@
-defmodule LockService.LockRequest do
+defmodule SharedStorage.LockRequest do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -68,7 +68,7 @@ defmodule LockService.LockRequest do
   field :lifetime, 10, type: :int32
 end
 
-defmodule LockService.LockRequestNoTime do
+defmodule SharedStorage.LockRequestNoTime do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -123,7 +123,7 @@ defmodule LockService.LockRequestNoTime do
   field :ticket, 2, type: :string
 end
 
-defmodule LockService.LockRequestList do
+defmodule SharedStorage.LockRequestList do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -193,7 +193,7 @@ defmodule LockService.LockRequestList do
   field :lifetime, 10, type: :int32
 end
 
-defmodule LockService.LockRequestNoTimeList do
+defmodule SharedStorage.LockRequestNoTimeList do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -248,7 +248,7 @@ defmodule LockService.LockRequestNoTimeList do
   field :tickets, 3, repeated: true, type: :string
 end
 
-defmodule LockService.LockResponse do
+defmodule SharedStorage.LockResponse do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -278,7 +278,7 @@ defmodule LockService.LockResponse do
           number: 6,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".lockService.LockRequest",
+          type_name: ".sharedStorage.LockRequest",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -328,12 +328,12 @@ defmodule LockService.LockResponse do
   end
 
   field :isError, 3, type: :bool
-  field :lock, 6, type: LockService.LockRequest
+  field :lock, 6, type: SharedStorage.LockRequest
   field :wastedTime, 17, type: :int32
   field :message, 20, type: :string
 end
 
-defmodule LockService.LockResponseList do
+defmodule SharedStorage.LockResponseList do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -363,7 +363,7 @@ defmodule LockService.LockResponseList do
           number: 6,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".lockService.LockResponse",
+          type_name: ".sharedStorage.LockResponse",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -399,11 +399,11 @@ defmodule LockService.LockResponseList do
   end
 
   field :isError, 3, type: :bool
-  field :responses, 6, repeated: true, type: LockService.LockResponse
+  field :responses, 6, repeated: true, type: SharedStorage.LockResponse
   field :wastedTime, 17, type: :int32
 end
 
-defmodule LockService.LockResponseNoTime do
+defmodule SharedStorage.LockResponseNoTime do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -433,7 +433,7 @@ defmodule LockService.LockResponseNoTime do
           number: 6,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".lockService.LockRequestNoTime",
+          type_name: ".sharedStorage.LockRequestNoTime",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -483,12 +483,12 @@ defmodule LockService.LockResponseNoTime do
   end
 
   field :isError, 3, type: :bool
-  field :lock, 6, type: LockService.LockRequestNoTime
+  field :lock, 6, type: SharedStorage.LockRequestNoTime
   field :wastedTime, 17, type: :int32
   field :message, 20, type: :string
 end
 
-defmodule LockService.LockResponseNoTimeList do
+defmodule SharedStorage.LockResponseNoTimeList do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -518,7 +518,7 @@ defmodule LockService.LockResponseNoTimeList do
           number: 6,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".lockService.LockRequestNoTime",
+          type_name: ".sharedStorage.LockRequestNoTime",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -554,11 +554,11 @@ defmodule LockService.LockResponseNoTimeList do
   end
 
   field :isError, 3, type: :bool
-  field :responses, 6, repeated: true, type: LockService.LockRequestNoTime
+  field :responses, 6, repeated: true, type: SharedStorage.LockRequestNoTime
   field :wastedTime, 17, type: :int32
 end
 
-defmodule LockService.PollResponse do
+defmodule SharedStorage.PollResponse do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -602,7 +602,7 @@ defmodule LockService.PollResponse do
           number: 6,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".lockService.LockRequestNoTime",
+          type_name: ".sharedStorage.LockRequestNoTime",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -639,11 +639,11 @@ defmodule LockService.PollResponse do
 
   field :isBlocked, 1, type: :bool
   field :isError, 3, type: :bool
-  field :lock, 6, type: LockService.LockRequestNoTime
+  field :lock, 6, type: SharedStorage.LockRequestNoTime
   field :wastedTime, 17, type: :int32
 end
 
-defmodule LockService.PollResponseList do
+defmodule SharedStorage.PollResponseList do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -659,7 +659,7 @@ defmodule LockService.PollResponseList do
           number: 1,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".lockService.PollResponse",
+          type_name: ".sharedStorage.PollResponse",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -708,15 +708,15 @@ defmodule LockService.PollResponseList do
     }
   end
 
-  field :responses, 1, repeated: true, type: LockService.PollResponse
+  field :responses, 1, repeated: true, type: SharedStorage.PollResponse
   field :isBlocked, 3, type: :bool
   field :isError, 5, type: :bool
 end
 
-defmodule LockService.LockService.Service do
+defmodule SharedStorage.LockService.Service do
   @moduledoc false
 
-  use GRPC.Service, name: "lockService.LockService", protoc_gen_elixir_version: "0.12.0"
+  use GRPC.Service, name: "sharedStorage.LockService", protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -725,8 +725,8 @@ defmodule LockService.LockService.Service do
       method: [
         %Google.Protobuf.MethodDescriptorProto{
           name: "AcquireLock",
-          input_type: ".lockService.LockRequest",
-          output_type: ".lockService.LockResponse",
+          input_type: ".sharedStorage.LockRequest",
+          output_type: ".sharedStorage.LockResponse",
           options: %Google.Protobuf.MethodOptions{
             deprecated: false,
             idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -740,8 +740,8 @@ defmodule LockService.LockService.Service do
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "ReleaseLock",
-          input_type: ".lockService.LockRequestNoTime",
-          output_type: ".lockService.LockResponseNoTime",
+          input_type: ".sharedStorage.LockRequestNoTime",
+          output_type: ".sharedStorage.LockResponseNoTime",
           options: %Google.Protobuf.MethodOptions{
             deprecated: false,
             idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -755,8 +755,8 @@ defmodule LockService.LockService.Service do
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "ExtendLock",
-          input_type: ".lockService.LockRequest",
-          output_type: ".lockService.LockResponse",
+          input_type: ".sharedStorage.LockRequest",
+          output_type: ".sharedStorage.LockResponse",
           options: %Google.Protobuf.MethodOptions{
             deprecated: false,
             idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -770,8 +770,8 @@ defmodule LockService.LockService.Service do
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "PersistLock",
-          input_type: ".lockService.LockRequestNoTime",
-          output_type: ".lockService.LockResponseNoTime",
+          input_type: ".sharedStorage.LockRequestNoTime",
+          output_type: ".sharedStorage.LockResponseNoTime",
           options: %Google.Protobuf.MethodOptions{
             deprecated: false,
             idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -785,8 +785,8 @@ defmodule LockService.LockService.Service do
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "PollLock",
-          input_type: ".lockService.LockRequestNoTime",
-          output_type: ".lockService.PollResponse",
+          input_type: ".sharedStorage.LockRequestNoTime",
+          output_type: ".sharedStorage.PollResponse",
           options: %Google.Protobuf.MethodOptions{
             deprecated: false,
             idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -800,8 +800,8 @@ defmodule LockService.LockService.Service do
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "PollLockList",
-          input_type: ".lockService.LockRequestNoTimeList",
-          output_type: ".lockService.PollResponseList",
+          input_type: ".sharedStorage.LockRequestNoTimeList",
+          output_type: ".sharedStorage.PollResponseList",
           options: %Google.Protobuf.MethodOptions{
             deprecated: false,
             idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -815,8 +815,8 @@ defmodule LockService.LockService.Service do
         },
         %Google.Protobuf.MethodDescriptorProto{
           name: "EnsureLock",
-          input_type: ".lockService.LockRequest",
-          output_type: ".lockService.LockResponse",
+          input_type: ".sharedStorage.LockRequest",
+          output_type: ".sharedStorage.LockResponse",
           options: %Google.Protobuf.MethodOptions{
             deprecated: false,
             idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -834,23 +834,23 @@ defmodule LockService.LockService.Service do
     }
   end
 
-  rpc :AcquireLock, LockService.LockRequest, LockService.LockResponse
+  rpc :AcquireLock, SharedStorage.LockRequest, SharedStorage.LockResponse
 
-  rpc :ReleaseLock, LockService.LockRequestNoTime, LockService.LockResponseNoTime
+  rpc :ReleaseLock, SharedStorage.LockRequestNoTime, SharedStorage.LockResponseNoTime
 
-  rpc :ExtendLock, LockService.LockRequest, LockService.LockResponse
+  rpc :ExtendLock, SharedStorage.LockRequest, SharedStorage.LockResponse
 
-  rpc :PersistLock, LockService.LockRequestNoTime, LockService.LockResponseNoTime
+  rpc :PersistLock, SharedStorage.LockRequestNoTime, SharedStorage.LockResponseNoTime
 
-  rpc :PollLock, LockService.LockRequestNoTime, LockService.PollResponse
+  rpc :PollLock, SharedStorage.LockRequestNoTime, SharedStorage.PollResponse
 
-  rpc :PollLockList, LockService.LockRequestNoTimeList, LockService.PollResponseList
+  rpc :PollLockList, SharedStorage.LockRequestNoTimeList, SharedStorage.PollResponseList
 
-  rpc :EnsureLock, LockService.LockRequest, LockService.LockResponse
+  rpc :EnsureLock, SharedStorage.LockRequest, SharedStorage.LockResponse
 end
 
-defmodule LockService.LockService.Stub do
+defmodule SharedStorage.LockService.Stub do
   @moduledoc false
 
-  use GRPC.Stub, service: LockService.LockService.Service
+  use GRPC.Stub, service: SharedStorage.LockService.Service
 end

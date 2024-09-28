@@ -3,7 +3,7 @@ defmodule SharedStorage.GRPCHandler.PollLock do
   A module for implementing poll_lock logic.
   """
 
-  alias LockService.{
+  alias SharedStorage.{
     LockRequestNoTime,
     PollResponse}
   alias SharedStorage.Redis.RedisClient

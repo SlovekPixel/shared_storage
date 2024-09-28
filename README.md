@@ -7,14 +7,12 @@ To start your Phoenix server:
   * Run `mix setup` to install and setup dependencies
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
   * Visit [`localhost:4000`](http://localhost:4000).
+  * Visit [`0.0.0.0:50051`](0.0.0.0:50051).
 
 ## Proto
-#### Generate proto files.
+#### Generate proto files: `generate_protos.sh`
 ``` bash
 protoc --elixir_out=gen_descriptors=true,plugins=grpc:. "./lib/protos/shared_storage.proto"
-```
-``` bash
-mix protobuf.generate --output-path=./lib --include-path=./lib/protos shared_storage.proto
 ```
 
 ## Docker

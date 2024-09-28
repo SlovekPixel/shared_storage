@@ -3,7 +3,7 @@ defmodule SharedStorage.GRPCHandler.PollLockList do
   A module for implementing poll_lock_list logic.
   """
 
-  alias LockService.{
+  alias SharedStorage.{
     LockRequestNoTimeList,
     LockRequestNoTime,
     PollResponse,

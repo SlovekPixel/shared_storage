@@ -3,7 +3,7 @@ defmodule SharedStorage.GRPCHandler.PersistLock do
   A module for implementing persist_lock logic.
   """
 
-  alias LockService.{
+  alias SharedStorage.{
     LockRequestNoTime,
     LockResponse}
   alias SharedStorage.Redis.RedisClient

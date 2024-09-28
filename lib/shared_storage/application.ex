@@ -17,7 +17,8 @@ defmodule SharedStorage.Application do
       # {SharedStorage.Worker, arg},
       # Start to serve requests, typically the last entry
       SharedStorageWeb.Endpoint,
-      SharedStorage.GRPCServer
+      {GRPC.Server.Supervisor, endpoint: SharedStorage.Endpoint, port: 50051, start_server: true},
+      GrpcReflection
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
