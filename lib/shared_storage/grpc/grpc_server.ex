@@ -47,7 +47,7 @@ defmodule SharedStorage.LockService.Server do
     response
   end
 
-  @spec acquire_lock(LockService.LockRequestNoTimeList.t(), GRPC.Server.Stream.t()) ::
+  @spec poll_lock_list(LockService.LockRequestNoTimeList.t(), GRPC.Server.Stream.t()) ::
           LockService.PollResponseList.t()
   def poll_lock_list(request, stream) do
     { status, response } = SharedStorage.GRPCHandler.PollLockList.poll_lock_list(request, stream)
