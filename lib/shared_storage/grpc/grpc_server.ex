@@ -4,7 +4,9 @@ defmodule SharedStorage.LockService.Server do
   """
 
   use GRPC.Server, service: SharedStorage.LockService.Service
+  use LoggingDecorator
 
+#  @decorate log()
   @spec acquire_lock(LockService.LockRequest.t(), GRPC.Server.Stream.t()) ::
     LockService.LockResponse.t()
   def acquire_lock(request, stream) do

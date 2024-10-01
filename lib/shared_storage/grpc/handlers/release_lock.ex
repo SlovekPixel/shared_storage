@@ -5,7 +5,8 @@ defmodule SharedStorage.GRPCHandler.ReleaseLock do
 
   alias SharedStorage.{
     LockRequestNoTime,
-    LockResponseNoTime}
+    LockResponseNoTime,
+  }
   alias SharedStorage.Redis.RedisClient
   alias SharedStorage.Messages.ResponseMessages
 

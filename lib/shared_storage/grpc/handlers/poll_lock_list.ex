@@ -7,7 +7,8 @@ defmodule SharedStorage.GRPCHandler.PollLockList do
     LockRequestNoTimeList,
     LockRequestNoTime,
     PollResponse,
-    PollResponseList}
+    PollResponseList,
+  }
   alias SharedStorage.Redis.RedisClient
 
   # Get the record blocked or not.

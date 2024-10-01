@@ -52,8 +52,7 @@ defmodule SharedStorage.MixProject do
       {:grpc_reflection, "~> 0.1.4"},
       {:grpc, "~> 0.9"},
       {:validate, "~> 1.3"},
-      {:faker, "~> 0.17", only: :test},
-      {:ex_machina, "~> 2.7.0", only: :test}
+      {:decorator, "~> 1.2"}
     ]
   end
 

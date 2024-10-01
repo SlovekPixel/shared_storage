@@ -9,7 +9,7 @@ import Config
 
 config :shared_storage,
   ecto_repos: [SharedStorage.Repo],
-  generators: [timestamp_type: :utc_datetime, binary_id: true]
+  generators: [timestamp_type: :utc_datetime, binary_id: true, sample_binary_id: "11111111-1111-1111-1111-111111111111"]
 
 # Configures the endpoint
 config :shared_storage, SharedStorageWeb.Endpoint,

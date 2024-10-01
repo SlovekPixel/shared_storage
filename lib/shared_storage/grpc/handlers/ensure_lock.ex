@@ -5,7 +5,8 @@ defmodule SharedStorage.GRPCHandler.EnsureLock do
 
   alias SharedStorage.{
     LockRequest,
-    LockResponse}
+    LockResponse,
+  }
   alias SharedStorage.Redis.RedisClient
   alias SharedStorage.Messages.ResponseMessages
 

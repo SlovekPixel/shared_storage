@@ -4,7 +4,7 @@ import Config
 config :shared_storage, SharedStorage.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "localhost", # localhost without docker, or ss_db
+  hostname: "localhost", # localhost without docker or ss_db with docker
   database: "shared_storage_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
