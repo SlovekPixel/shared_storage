@@ -58,10 +58,13 @@ message LockResponseList {
   repeated LockResponse responses = 6;
   // Time spent on the request.
   int32 wastedTime = 17;
+  // Additional message
+  string message = 20;
 }
 
 message LockResponseNoTime {
   bool isError = 3;
+  // ArrayList of LockResponse
   LockRequestNoTime lock = 6;
   // Time spent on the request.
   int32 wastedTime = 17;
@@ -75,6 +78,8 @@ message LockResponseNoTimeList {
   repeated LockRequestNoTime responses = 6;
   // Time spent on the request.
   int32 wastedTime = 17;
+  // Additional message
+  string message = 20;
 }
 
 message PollResponse {
@@ -83,6 +88,8 @@ message PollResponse {
   LockRequestNoTime lock = 6;
   // Time spent on the request.
   int32 wastedTime = 17;
+  // Additional message
+  string message = 20;
 }
 
 message PollResponseList {
@@ -90,4 +97,6 @@ message PollResponseList {
   // Result of whole pollList.
   bool isBlocked = 3;
   bool isError = 5;
+  // Additional message
+  string message = 20;
 }

@@ -10,6 +10,8 @@ defmodule SharedStorage.GRPCHandler.ExtendLock do
   alias SharedStorage.Redis.RedisClient
   alias SharedStorage.Messages.ResponseMessages
 
+  @method_name "extend_lock"
+
   # Only if the record is locked, then change the record lock time to the passed time, owner must match.
   def extend_lock(%LockRequest{owner: owner, ticket: ticket, lifetime: lifetime}, _stream) do
     case RedisClient.is_ticket_locked(ticket) do
@@ -18,17 +20,17 @@ defmodule SharedStorage.GRPCHandler.ExtendLock do
           {:ok, true} ->
             case RedisClient.set_timeLock_force(owner, ticket, lifetime) do
               :ok ->
-                {:ok, %LockResponse{
+                %LockResponse{
                   isError: false,
                   lock: %LockRequest{
                     owner: owner,
                     ticket: ticket,
                     lifetime: lifetime
                   },
-                  message: ResponseMessages.success_message("extend_lock")
-                }}
+                  message: ResponseMessages.success_message(@method_name)
+                }
               {:error, reason} ->
-                {:ok, %LockResponse{
+                %LockResponse{
                   isError: true,
                   lock: %LockRequest{
                     owner: owner,
@@ -36,11 +38,11 @@ defmodule SharedStorage.GRPCHandler.ExtendLock do
                     lifetime: lifetime
                   },
                   message: reason
-                }}
+                }
             end
 
           {:ok, false} ->
-            {:ok, %LockResponse{
+            %LockResponse{
               isError: true,
               lock: %LockRequest{
                 owner: owner,
@@ -48,10 +50,10 @@ defmodule SharedStorage.GRPCHandler.ExtendLock do
                 lifetime: lifetime
               },
               message: ResponseMessages.owner_mismatch()
-            }}
+            }
 
           {:error, reason} ->
-            {:ok, %LockResponse{
+            %LockResponse{
               isError: true,
               lock: %LockRequest{
                 owner: owner,
@@ -59,10 +61,10 @@ defmodule SharedStorage.GRPCHandler.ExtendLock do
                 lifetime: lifetime
               },
               message: reason
-            }}
+            }
         end
       {:ok, false} ->
-        {:ok, %LockResponse{
+        %LockResponse{
           isError: true,
           lock: %LockRequest{
             owner: owner,
@@ -70,9 +72,9 @@ defmodule SharedStorage.GRPCHandler.ExtendLock do
             lifetime: lifetime
           },
           message: ResponseMessages.ticket_not_blocked()
-        }}
+        }
       {:error, reason} ->
-        {:ok, %LockResponse{
+        %LockResponse{
           isError: true,
           lock: %LockRequest{
             owner: owner,
@@ -80,7 +82,7 @@ defmodule SharedStorage.GRPCHandler.ExtendLock do
             lifetime: lifetime
           },
           message: reason
-        }}
+        }
     end
   end
 end

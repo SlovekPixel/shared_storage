@@ -8,37 +8,43 @@ defmodule SharedStorage.GRPCHandler.PollLock do
     PollResponse,
   }
   alias SharedStorage.Redis.RedisClient
+  alias SharedStorage.Messages.ResponseMessages
+
+  @method_name "poll_lock"
 
   # Get the record blocked or not.
   def poll_lock(%LockRequestNoTime{owner: owner, ticket: ticket}, _stream) do
     case RedisClient.is_ticket_locked(ticket) do
       {:ok, false} ->
-        {:ok, %PollResponse{
+        %PollResponse{
           isError: false,
           isBlocked: false,
           lock: %LockRequestNoTime{
             owner: owner,
             ticket: ticket,
-          }
-        }}
+          },
+          message: ResponseMessages.success_message(@method_name)
+        }
       {:ok, true} ->
-        {:ok, %PollResponse{
+        %PollResponse{
           isError: false,
           isBlocked: true,
           lock: %LockRequestNoTime{
             owner: owner,
             ticket: ticket,
-          }
-        }}
-      {:error, _reason} ->
-        {:ok, %PollResponse{
+          },
+          message: ResponseMessages.success_message(@method_name)
+        }
+      {:error, reason} ->
+        %PollResponse{
           isError: true,
           isBlocked: true,
           lock: %LockRequestNoTime{
             owner: owner,
             ticket: ticket,
-          }
-        }}
+          },
+          message: reason
+        }
     end
   end
 end

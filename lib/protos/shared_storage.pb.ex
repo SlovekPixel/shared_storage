@@ -384,6 +384,20 @@ defmodule SharedStorage.LockResponseList do
           json_name: "wastedTime",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "message",
+          extendee: nil,
+          number: 20,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "message",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -401,6 +415,7 @@ defmodule SharedStorage.LockResponseList do
   field :isError, 3, type: :bool
   field :responses, 6, repeated: true, type: SharedStorage.LockResponse
   field :wastedTime, 17, type: :int32
+  field :message, 20, type: :string
 end
 
 defmodule SharedStorage.LockResponseNoTime do
@@ -539,6 +554,20 @@ defmodule SharedStorage.LockResponseNoTimeList do
           json_name: "wastedTime",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "message",
+          extendee: nil,
+          number: 20,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "message",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -556,6 +585,7 @@ defmodule SharedStorage.LockResponseNoTimeList do
   field :isError, 3, type: :bool
   field :responses, 6, repeated: true, type: SharedStorage.LockRequestNoTime
   field :wastedTime, 17, type: :int32
+  field :message, 20, type: :string
 end
 
 defmodule SharedStorage.PollResponse do
@@ -623,6 +653,20 @@ defmodule SharedStorage.PollResponse do
           json_name: "wastedTime",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "message",
+          extendee: nil,
+          number: 20,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "message",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -641,6 +685,7 @@ defmodule SharedStorage.PollResponse do
   field :isError, 3, type: :bool
   field :lock, 6, type: SharedStorage.LockRequestNoTime
   field :wastedTime, 17, type: :int32
+  field :message, 20, type: :string
 end
 
 defmodule SharedStorage.PollResponseList do
@@ -694,6 +739,20 @@ defmodule SharedStorage.PollResponseList do
           json_name: "isError",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "message",
+          extendee: nil,
+          number: 20,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "message",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -711,6 +770,7 @@ defmodule SharedStorage.PollResponseList do
   field :responses, 1, repeated: true, type: SharedStorage.PollResponse
   field :isBlocked, 3, type: :bool
   field :isError, 5, type: :bool
+  field :message, 20, type: :string
 end
 
 defmodule SharedStorage.LockService.Service do

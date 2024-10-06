@@ -10,61 +10,63 @@ defmodule SharedStorage.GRPCHandler.ReleaseLock do
   alias SharedStorage.Redis.RedisClient
   alias SharedStorage.Messages.ResponseMessages
 
+  @method_name "release_lock"
+
   # Unlocks the record if the record is locked and owner matches.
   def release_lock(%LockRequestNoTime{owner: owner, ticket: ticket}, _stream) do
     case RedisClient.verify_owner(owner, ticket) do
       {:ok, true} ->
         case RedisClient.release_lock(owner, ticket) do
           :ok ->
-            {:ok, %LockResponseNoTime{
+            %LockResponseNoTime{
               isError: false,
               lock: %LockRequestNoTime{
                 owner: owner,
                 ticket: ticket
               },
-              message: ResponseMessages.success_message("release_lock")
-            }}
+              message: ResponseMessages.success_message(@method_name)
+            }
 
           {:error, :not_found} ->
-            {:ok, %LockResponseNoTime{
+            %LockResponseNoTime{
               isError: true,
               lock: %LockRequestNoTime{
                 owner: owner,
                 ticket: ticket
               },
               message: ResponseMessages.ticket_not_blocked()
-            }}
+            }
 
           {:error, reason} ->
-            {:ok, %LockResponseNoTime{
+            %LockResponseNoTime{
               isError: true,
               lock: %LockRequestNoTime{
                 owner: owner,
                 ticket: ticket
               },
               message: reason
-            }}
+            }
         end
 
       {:ok, false} ->
-        {:ok, %LockResponseNoTime{
+        %LockResponseNoTime{
           isError: true,
           lock: %LockRequestNoTime{
             owner: owner,
             ticket: ticket,
           },
           message: ResponseMessages.ticket_not_blocked()
-        }}
+        }
 
       {:error, reason} ->
-        {:ok, %LockResponseNoTime{
+        %LockResponseNoTime{
           isError: true,
           lock: %LockRequestNoTime{
             owner: owner,
             ticket: ticket,
           },
           message: reason
-        }}
+        }
     end
   end
 end

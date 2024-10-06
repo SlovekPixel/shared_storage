@@ -10,22 +10,24 @@ defmodule SharedStorage.GRPCHandler.AcquireLock do
   alias SharedStorage.Redis.RedisClient
   alias SharedStorage.Messages.ResponseMessages
 
+  @method_name "acquire_lock"
+
   def acquire_lock(%LockRequest{owner: owner, ticket: ticket, lifetime: lifetime}, _stream) do
     case RedisClient.is_ticket_locked(ticket) do
       {:ok, false} ->
         case RedisClient.set_timeLock_notExists(owner, ticket, lifetime) do
           :ok ->
-            {:ok, %LockResponse{
+            %LockResponse{
               isError: false,
               lock: %LockRequest{
                 owner: owner,
                 ticket: ticket,
                 lifetime: lifetime
               },
-              message: ResponseMessages.success_message("acquire_lock")
-            }}
+              message: ResponseMessages.success_message(@method_name)
+            }
           {:error, reason} ->
-            {:ok, %LockResponse{
+            %LockResponse{
               isError: true,
               lock: %LockRequest{
                 owner: owner,
@@ -33,10 +35,10 @@ defmodule SharedStorage.GRPCHandler.AcquireLock do
                 lifetime: lifetime
               },
               message: reason
-            }}
+            }
         end
       {:ok, true} ->
-        {:ok, %LockResponse{
+        %LockResponse{
           isError: true,
           lock: %LockRequest{
             owner: owner,
@@ -44,9 +46,9 @@ defmodule SharedStorage.GRPCHandler.AcquireLock do
             lifetime: lifetime
           },
           message: ResponseMessages.ticket_already_blocked()
-        }}
+        }
       {:error, reason} ->
-        {:ok, %LockResponse{
+        %LockResponse{
           isError: true,
           lock: %LockRequest{
             owner: owner,
@@ -54,7 +56,7 @@ defmodule SharedStorage.GRPCHandler.AcquireLock do
             lifetime: lifetime
           },
           message: reason
-        }}
+        }
     end
   end
 end

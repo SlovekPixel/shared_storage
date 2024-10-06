@@ -10,6 +10,9 @@ defmodule SharedStorage.GRPCHandler.PollLockList do
     PollResponseList,
   }
   alias SharedStorage.Redis.RedisClient
+  alias SharedStorage.Messages.ResponseMessages
+
+  @method_name "poll_lock_list"
 
   # Get the record blocked or not.
   def poll_lock_list(%LockRequestNoTimeList{owner: owner, tickets: tickets}, _stream) do
@@ -24,7 +27,8 @@ defmodule SharedStorage.GRPCHandler.PollLockList do
               lock: %LockRequestNoTime{
                 owner: owner,
                 ticket: ticket
-              }
+              },
+              message: ResponseMessages.success_message(@method_name)
             }
           {:ok, true} ->
             %PollResponse{
@@ -33,26 +37,30 @@ defmodule SharedStorage.GRPCHandler.PollLockList do
               lock: %LockRequestNoTime{
                 owner: owner,
                 ticket: ticket
-              }
+              },
+              message: ResponseMessages.success_message(@method_name)
             }
-          {:error, _reason} ->
+          {:error, reason} ->
             %PollResponse{
               isError: true,
               isBlocked: true,
               lock: %LockRequestNoTime{
                 owner: owner,
                 ticket: ticket
-              }
+              },
+              message: reason
             }
         end
       end)
 
     overall_is_blocked = Enum.any?(responses, fn resp -> resp.isBlocked end)
-#    overall_is_error = Enum.any?(responses, fn resp -> resp.isError end)
+    overall_is_error = Enum.any?(responses, fn resp -> resp.isError end)
 
-    {:ok, %PollResponseList{
+    %PollResponseList{
       isBlocked: overall_is_blocked,
-      responses: responses
-    }}
+      isError: overall_is_error,
+      responses: responses,
+      message: ResponseMessages.success_message(@method_name),
+    }
   end
 end
