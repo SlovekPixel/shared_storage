@@ -1,62 +1,91 @@
 defmodule SharedStorage.Validators.LockValidator do
-  import Ecto.Changeset
-  alias SharedStorage.{
-    LockRequestNoTime,
-    PollResponse,
-  }
-
-  @doc """
+  @moduledoc """
   Input Data Validation.
   """
 
-  def validate_lifetime(params) do
+#  import Ecto.Changeset
+  alias SharedStorage.{
+    LockRequest,
+    LockRequestNoTime,
+    PollResponse,
+    LockResponse,
+    LockResponseNoTime,
+    PollResponseList,
+  }
+
+  @common_rules %{
+    "owner" => [required: true, type: :string, uuid: true],
+    "ticket" => [required: true, type: :string, uuid: true]
+  }
+
+  defp format_errors(errors) do
+    Enum.map(errors, fn %Validate.Validator.Error{path: path, message: message, rule: _rule} ->
+      "#{Enum.join(path, ".")}: #{message}"
+    end)
+  end
+
+  def validate_lock_request(params) do
     input = %{
       "owner" => params.owner,
       "ticket" => params.ticket,
       "lifetime" => params.lifetime,
     }
 
-    rules = %{
-      "owner" => [required: true, type: :string],
-      "ticket" => [required: true, type: :string],
-      "lifetime" => [required: true, type: :number]
-    }
+    rules = Map.put(@common_rules, "lifetime", [required: true, type: :number])
 
     case Validate.validate(input, rules) do
-      {:ok, data} -> {:ok, data}
+      {:ok, _} -> :ok
       {:error, errors} ->
-        response = %PollResponse{
+        formatted_errors = format_errors(errors)
+
+        response = %LockResponse{
           isError: true,
-          isBlocked: true,
-          lock: %LockRequestNoTime{
+          lock: %LockRequest{
             owner: params.owner,
-            ticket: params.ticket
+            ticket: params.ticket,
+            lifetime: params.lifetime
           },
-          message: Enum.join(errors, ", ")
+          message: Enum.join(formatted_errors, ", ")
         }
 
         {:error, response}
     end
   end
 
-  def validate_no_lifetime(params) do
+  def validate_lock_request_no_time(params) do
     input = %{
       "owner" => params.owner,
       "ticket" => params.ticket
     }
 
-    rules = %{
-      "owner" => [required: true, type: :string],
-      "ticket" => [required: true, type: :string],
+    case Validate.validate(input, @common_rules) do
+      {:ok, _} -> :ok
+      {:error, errors} ->
+        formatted_errors = format_errors(errors)
+
+        response = %LockResponseNoTime{
+          isError: true,
+          lock: %LockRequestNoTime{
+            owner: params.owner,
+            ticket: params.ticket
+          },
+          message: Enum.join(formatted_errors, ", ")
+        }
+
+        {:error, response}
+    end
+  end
+
+  def validate_poll_request(params) do
+    input = %{
+      "owner" => params.owner,
+      "ticket" => params.ticket
     }
 
-    case Validate.validate(input, rules) do
-      {:ok, data} -> {:ok, data}
+    case Validate.validate(input, @common_rules) do
+      {:ok, _} -> :ok
       {:error, errors} ->
-        formatted_errors = Enum.map(errors, fn %Validate.Validator.Error{path: path, message: message, rule: _rule} ->
-          "#{Enum.join(path, ".")}: #{message}"
-        end)
-        IO.puts(Enum.join(formatted_errors, ", "))
+        formatted_errors = format_errors(errors)
 
         response = %PollResponse{
           isError: true,
@@ -72,35 +101,46 @@ defmodule SharedStorage.Validators.LockValidator do
     end
   end
 
-  def validate_poll(params) do
+  def validate_lock_request_no_time_list(params) do
     input = %{
       "owner" => params.owner,
-      "ticket" => params.ticket
+      "tickets" => params.tickets
     }
 
     rules = %{
-      "owner" => [required: true, type: :string],
-      "ticket" => [required: true, type: :string],
+      "owner" => [required: true, type: :string, uuid: true],
+      "tickets" => [
+        required: true,
+        type: :list,
+        list: [required: true, type: :string, uuid: true],
+      ],
     }
 
     case Validate.validate(input, rules) do
       {:ok, _} -> :ok
       {:error, errors} ->
-        formatted_errors = Enum.map(errors, fn %Validate.Validator.Error{path: path, message: message, rule: _rule} ->
-          "#{Enum.join(path, ".")}: #{message}"
+        responses = Enum.map(params.tickets, fn ticket ->
+          lock_data = %LockRequestNoTime{
+            owner: params.owner,
+            ticket: ticket
+          }
+
+          %PollResponse{
+            isBlocked: true,
+            isError: true,
+            lock: lock_data
+          }
         end)
 
-        response = %PollResponse{
-          isError: true,
+        formatted_errors = format_errors(errors)
+        poll_response_list = %PollResponseList{
+          responses: responses,
           isBlocked: true,
-          lock: %LockRequestNoTime{
-            owner: params.owner,
-            ticket: params.ticket
-          },
+          isError: true,
           message: Enum.join(formatted_errors, ", ")
         }
 
-        {:error, response}
+        {:error, poll_response_list}
     end
   end
 end
