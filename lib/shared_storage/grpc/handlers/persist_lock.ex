@@ -5,7 +5,7 @@ defmodule SharedStorage.GRPCHandler.PersistLock do
 
   alias SharedStorage.{
     LockRequestNoTime,
-    LockResponse,
+    LockResponseNoTime,
   }
   alias SharedStorage.Redis.RedisClient
   alias SharedStorage.Messages.ResponseMessages
@@ -18,7 +18,7 @@ defmodule SharedStorage.GRPCHandler.PersistLock do
       {:ok, false} ->
         case RedisClient.set_noTimeLock_force(owner, ticket) do
           :ok ->
-            %LockResponse{
+            %LockResponseNoTime{
               isError: false,
               lock: %LockRequestNoTime{
                 owner: owner,
@@ -27,7 +27,7 @@ defmodule SharedStorage.GRPCHandler.PersistLock do
               message: ResponseMessages.success_message(@method_name)
             }
           {:error, reason} ->
-            %LockResponse{
+            %LockResponseNoTime{
               isError: true,
               lock: %LockRequestNoTime{
                 owner: owner,
@@ -37,7 +37,7 @@ defmodule SharedStorage.GRPCHandler.PersistLock do
             }
         end
       {:ok, true} ->
-        %LockResponse{
+        %LockResponseNoTime{
           isError: true,
           lock: %LockRequestNoTime{
             owner: owner,
@@ -46,7 +46,7 @@ defmodule SharedStorage.GRPCHandler.PersistLock do
           message: ResponseMessages.ticket_already_blocked()
         }
       {:error, reason} ->
-        %LockResponse{
+        %LockResponseNoTime{
           isError: true,
           lock: %LockRequestNoTime{
             owner: owner,

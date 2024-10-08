@@ -6,14 +6,16 @@ defmodule SharedStorage.LockLogs do
     field :method, :string
     field :ticket, :binary_id
     field :owner, :string
-    field :lifetime, :integer
+#    field :lifetime, :integer
+    field :message, :string
+    field :wasted_time, :integer
 
     timestamps()
   end
 
   def changeset(log, attrs) do
     log
-    |> cast(attrs, [:method, :ticket, :owner, :lifetime])
-    |> validate_required([:method, :ticket, :owner, :lifetime])
+    |> cast(attrs, [:method, :ticket, :owner, :message, :wasted_time])
+    |> validate_required([:method, :ticket, :owner, :message, :wasted_time])
   end
 end

@@ -31,7 +31,7 @@ defmodule SharedStorage.Validators.LockValidator do
       "lifetime" => params.lifetime,
     }
 
-    rules = Map.put(@common_rules, "lifetime", [required: true, type: :number])
+    rules = Map.put(@common_rules, "lifetime", [required: true, type: :number, min: 1, max: 1000])
 
     case Validate.validate(input, rules) do
       {:ok, _} -> :ok

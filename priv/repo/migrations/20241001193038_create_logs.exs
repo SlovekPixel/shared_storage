@@ -6,7 +6,8 @@ defmodule SharedStorage.Repo.Migrations.CreateLogs do
       add :method, :string
       add :ticket, :binary_id
       add :owner, :string
-      add :lifetime, :integer
+      add :message, :string
+      add :wasted_time, :integer
 
       timestamps()
     end
