@@ -7,6 +7,9 @@ defmodule SharedStorageWeb.Router do
 
   scope "/api", SharedStorageWeb do
     pipe_through :api
+
+    get "/ping", PingController, :ping
+    get "/locks", LocksController, :index
   end
 
   # Enable LiveDashboard in development

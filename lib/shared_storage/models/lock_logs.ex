@@ -2,11 +2,12 @@ defmodule SharedStorage.LockLogs do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :method, :ticket, :owner, :message, :wasted_time, :inserted_at, :updated_at]}
+
   schema "lock_logs" do
     field :method, :string
     field :ticket, :binary_id
     field :owner, :string
-#    field :lifetime, :integer
     field :message, :string
     field :wasted_time, :integer
 

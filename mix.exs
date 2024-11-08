@@ -36,6 +36,8 @@ defmodule SharedStorage.MixProject do
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
+      {:phoenix_html, "~> 3.0"},
+      {:phoenix_live_reload, "~> 1.3", only: :dev},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -51,6 +53,7 @@ defmodule SharedStorage.MixProject do
       {:google_protos, "~> 0.4.0"},
       {:grpc_reflection, "~> 0.1.4"},
       {:grpc, "~> 0.9"},
+      {:corsica, "~> 2.0"},
       {:validate, "~> 1.3"},
       {:decorator, "~> 1.2"}
     ]

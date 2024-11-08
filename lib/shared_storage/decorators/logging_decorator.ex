@@ -1,10 +1,6 @@
 defmodule LoggingDecorator do
   use Decorator.Define, [log: 0]
   alias SharedStorage.{Repo, LockLogs}
-  alias SharedStorage.{
-    LockRequest,
-    LockResponse,
-  }
 
   def log(body, context) do
     quote do
