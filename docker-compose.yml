@@ -1,31 +1,46 @@
-version: '3'
 services:
-  # PostgreSQL service
-  postgres:
-    image: postgres
-    container_name: ss_db
+  # Cassandra service
+  cassandra:
+    image: cassandra:4.0
+    container_name: ss_cassandra
     ports:
-      - "5432:5432"
+      - "9042:9042"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_RACK=rack1
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+  # Redis service
+  redis:
+    image: redis:6.2
+    container_name: ss_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - phoenix-network
 
-  # Phoenix app service
+  # SS service
   phoenix_app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: phoenix_app
     environment:
-      MIX_ENV: dev
+      MIX_ENV: prod
     ports:
       - "4000:4000"
     depends_on:
       - postgres
     networks:
       - phoenix-network
+
+volumes:
+  cassandra_data:
+  redis_data:
 
 networks:
   phoenix-network:

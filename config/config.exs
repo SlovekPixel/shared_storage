@@ -8,19 +8,7 @@
 import Config
 
 config :shared_storage,
-  ecto_repos: [SharedStorage.Repo],
-  generators: [timestamp_type: :utc_datetime, binary_id: true, sample_binary_id: "11111111-1111-1111-1111-111111111111"]
-
-# Configures the endpoint
-config :shared_storage, SharedStorageWeb.Endpoint,
-  url: [host: "localhost"],
-  adapter: Bandit.PhoenixAdapter,
-  render_errors: [
-    formats: [json: SharedStorageWeb.ErrorJSON],
-    layout: false
-  ],
-  pubsub_server: SharedStorage.PubSub,
-  live_view: [signing_salt: "GTpRLS+t"]
+  generators: [timestamp_type: :utc_datetime]
 
 # Configures Elixir's Logger
 config :logger, :console,

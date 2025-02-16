@@ -2,8 +2,7 @@ FROM elixir:1.17
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y postgresql-client
+RUN apt-get update
 
 COPY . /app
 
@@ -19,4 +18,4 @@ ENV MIX_ENV=dev
 
 RUN mix compile
 
-CMD ["sh", "-c", "mix ecto.create && mix ecto.migrate && DATABASE_URL=ecto://postgres:postgres@ss_db/shared_storage_dev mix phx.server"]
+CMD ["sh", "-c", "mix setup && mix phx.server"]
